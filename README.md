@@ -8,37 +8,37 @@ A full-stack MERN application that enables developers to collaborate, share know
 
 📌 Features
 
-🔐 User Authentication (JWT-based login & signup)
-
-📝 Create, view, and delete posts
-
-💬 Comment on posts
-
-👤 User profiles
-
-⚡ Responsive UI with smooth user experience
+     🔐 User Authentication (JWT-based login & signup)
+     
+     📝 Create, view, and delete posts
+     
+     💬 Comment on posts
+     
+     👤 User profiles
+     
+     ⚡ Responsive UI with smooth user experience
 
 🛠️ Tech Stack
 
 Frontend:
 
-React.js
-
-CSS
+     React.js
+     
+     CSS
 
 Backend:
 
-Node.js
-
-Express.js
+     Node.js
+     
+     Express.js
 
 Database:
 
-MongoDB
+     MongoDB
 
 Authentication:
 
-JSON Web Tokens (JWT)
+     JSON Web Tokens (JWT)
 
 🏗️ Architecture
 
