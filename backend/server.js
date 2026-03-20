@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const userRoutes = require("./routes/userRoutes");
+
+
 
 const connectDB = require('./config/db');
 
@@ -18,6 +21,7 @@ app.use('/api/posts', postRoutes);
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+app.use("/api/users", userRoutes);
 const authMiddleware = require('./middleware/authMiddleware');
 
 // database connection
