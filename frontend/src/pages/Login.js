@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { login } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate(); // ✅ inside component
+  const navigate = useNavigate(); //  inside component
 
   const handleLogin = async () => {
     const data = await login({ email, password });
@@ -41,6 +42,9 @@ function Login() {
       <button onClick={handleLogin} className="btn btn-success w-100">
         Login
       </button>
+      <Link to="/signup" className="btn btn-outline-success w-100 mt-2">
+        Create Account
+      </Link>
     </div>
   </div>
 )

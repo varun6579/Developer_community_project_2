@@ -14,6 +14,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  gender: {
+  type: String,
+  enum: ["male", "female"],
+  default: "male"
+},
+  bio: {
+  type: String,
+  default: "Hey! I am using Dev Community 🚀"
+},
   skills: {
     type: [String],
     default: []
