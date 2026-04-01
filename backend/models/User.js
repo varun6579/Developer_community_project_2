@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
   type: String,
   default: "Hey! I am using Dev Community 🚀"
 },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
   skills: {
     type: [String],
     default: []

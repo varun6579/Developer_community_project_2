@@ -22,6 +22,19 @@ const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
 app.use("/api/users", userRoutes);
+
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin/auth', adminRoutes);
+
+const articleRoutes = require("./routes/articleRoutes");
+const challengeRoutes = require("./routes/challengeRoutes");
+
+app.use("/api/articles", articleRoutes);
+app.use("/api/challenges", challengeRoutes);
+
+const messageRoutes = require("./routes/messageRoutes");
+app.use("/api/messages", messageRoutes);
+
 const authMiddleware = require('./middleware/authMiddleware');
 
 // database connection
@@ -32,8 +45,23 @@ app.get('/', (req, res) => {
   res.send('API is running');
 });
 
-app.get('/api/protected', authMiddleware, (req, res) => {
-  res.json({ message: 'This is protected data', user: req.user });
+app.get('/api/protected', authMiddleware, async (req, res) => {
+  try {
+    const isAdminAcc = req.user.role === 'admin' || req.user.isAdmin === true;
+    
+    if (isAdminAcc) {
+      const admin = await require('./models/Admin').findById(req.user.id).select('-password');
+      if (!admin) return res.status(404).json({ message: "Admin not found" });
+      return res.json({ user: { ...admin.toObject(), isAdmin: true } });
+    }
+    
+    const user = await require('./models/User').findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ user });
+  } catch (err) {
+    console.error("Protected route error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;

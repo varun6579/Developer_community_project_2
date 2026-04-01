@@ -1,150 +1,138 @@
 import { useEffect, useState } from "react";
-import { getPosts, createPost } from "../services/api";
+import Layout from "../components/Layout";
+import PostCard from "../components/PostCard";
+import { getPosts, getCurrentUser } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 function Home() {
-
   const [posts, setPosts] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [showForm, setShowForm] = useState(false); // ✅ NEW
-
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
-  // 🔐 Protect route
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/");
-    }
-  }, [navigate]);
-
-  const fetchPosts = async () => {
-    const data = await getPosts();
-    setPosts(data);
-  };
-
-  useEffect(() => {
-    fetchPosts();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [postsData, userData] = await Promise.all([
+          getPosts(),
+          getCurrentUser()
+        ]);
+        
+        setPosts(postsData);
+        if (userData && userData.user) {
+          setCurrentUser(userData.user);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
-  const handleCreatePost = async () => {
-    await createPost({ title, content });
-    setTitle("");
-    setContent("");
-    setShowForm(false); // ✅ close form after post
-    fetchPosts();
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
-
   return (
-    <div className="container-fluid">
-      <div className="row">
+    <Layout>
+      {/* Title Section */}
+      <div className="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+          <h4 className="fw-bold text-dark mb-1">
+             Hey {currentUser ? currentUser.name : "Developer"}, what do you want to learn today?
+          </h4>
+          <p className="text-secondary small mb-0">
+             Get instant answers from the community, grounded in verified knowledge.
+          </p>
+        </div>
+        <button 
+          className="btn btn-outline-primary shadow-sm"
+          onClick={() => navigate('/questions')}
+        >
+          Ask Question
+        </button>
+      </div>
 
-        {/* Sidebar */}
-        <div className="col-2 bg-light vh-100 p-3">
-  <h5 className="text-success mb-3">Dev Community</h5>
 
-  <Link to="/home" className="d-block mb-2 text-decoration-none">🏠 Home</Link>
-  <Link to="/questions" className="d-block mb-2 text-decoration-none">❓ Questions</Link>
-  <Link to="/ai" className="d-block mb-2 text-decoration-none">🤖 AI Assist</Link>
-  <Link to="/tags" className="d-block mb-2 text-decoration-none">🏷 Tags</Link>
-  <Link to="/challenges" className="d-block mb-2 text-decoration-none">🏆 Challenges</Link>
-  <Link to="/chat" className="d-block mb-2 text-decoration-none">💬 Chat</Link>
-  <Link to="/articles" className="d-block mb-2 text-decoration-none">📰 Articles</Link>
-  <Link to="/users" className="d-block mb-2 text-decoration-none">👤 Users</Link>
-  <Link to="/companies" className="d-block mb-2 text-decoration-none">🏢 Companies</Link>
-</div>
 
-        {/* Main */}
-        <div className="col-7 p-4">
-
-          {/* Header */}
-          <div className="d-flex align-items-center mb-3">
-
-  <h4 className="me-auto">Latest Posts</h4>
-
-  <button
-    onClick={() => setShowForm(!showForm)}
-    className="btn btn-success me-2"
-  >
-    {showForm ? "Close" : "Ask Question"}
-  </button>
-
-  
-
-</div>
-          {/* Ask Question Form */}
-          {showForm && (
-            <div className="card p-3 mb-4 shadow">
-              <h5 className="text-success mb-2">Ask a Question</h5>
-
-              <input
-                className="form-control mb-2"
-                placeholder="Enter title..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-
-              <textarea
-                className="form-control mb-2"
-                placeholder="Describe your problem..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-              />
-
-              <button onClick={handleCreatePost} className="btn btn-success">
-                Post Question
-              </button>
-            </div>
-          )}
-
-          {/* Posts */}
-          {posts.map((post) => (
-            <div key={post._id} className="card p-3 mb-3 shadow-sm">
-              <h5 className="text-primary">{post.title}</h5>
-              <p>{post.content}</p>
-
-              <small
-                className="text-success fw-bold"
-                style={{ cursor: "pointer" }}
-                onClick={() => navigate(`/profile/${post.user._id}`)}
+      {/* Metrics Row */}
+      <div className="row g-3 mb-5">
+        
+        {/* Reputation */}
+        <div className="col-md-4">
+          <div className="card shadow-sm border-0 h-100 p-3 rounded-3">
+            <h6 className="fw-bold mb-3">Reputation</h6>
+            <div className="d-flex align-items-end mb-3">
+              <span className="display-4 fw-light me-3 lh-1">1</span>
+              <div 
+                className="w-100" 
+                style={{ height: "40px", background: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(13, 110, 253, 0.1) 10px, rgba(13, 110, 253, 0.1) 20px)" }}
               >
-                👤 {post.user?.name}
-              </small>
+                {/* Visual dotted Graph Mockup */}
+                <svg viewBox="0 0 100 20" className="w-100 h-100">
+                  <polyline fill="none" stroke="#0d6efd" strokeWidth="2" strokeDasharray="4" points="0,15 20,10 40,12 60,5 80,8 100,2" />
+                </svg>
+              </div>
             </div>
-          ))}
-
+            <p className="small text-muted mb-0">
+              Earn reputation by <a href="#ask" className="text-decoration-none">Asking</a>, <a href="#answer" className="text-decoration-none">Answering</a> & <a href="#edit" className="text-decoration-none">Editing</a>.
+            </p>
+          </div>
         </div>
 
-        {/* Right Panel */}
-        <div className="col-3 bg-light vh-100 p-3">
+        {/* Badge Progress */}
+        <div className="col-md-4">
+          <div className="card shadow-sm border-0 h-100 p-3 rounded-3">
+            <h6 className="fw-bold mb-3">Badge progress</h6>
+            <p className="small text-muted mb-4 mt-2">
+              Take the tour to earn your first badge!
+            </p>
+            <button className="btn btn-primary btn-sm rounded-pill mt-auto w-75 py-2">
+              Get started here
+            </button>
+          </div>
+        </div>
 
-  {/* Logout Top Right */}
-  <div className="d-flex justify-content-end mb-3">
-    <button onClick={handleLogout} className="btn btn-danger btn-sm">
-      Logout
-    </button>
-  </div>
-
-  <h5>📢 Announcements</h5>
-  <hr />
-  <p>🚀 Welcome to Dev Community</p>
-  <p>🔥 Start asking questions</p>
-
-  <h6 className="mt-4">👥 Top Users</h6>
-  <p>Varun</p>
-  <p>Guest</p>
-
-</div>
+        {/* Watched Tags */}
+        <div className="col-md-4">
+          <div className="card shadow-sm border-0 h-100 p-3 rounded-3 position-relative">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h6 className="fw-bold mb-0">Watched tags</h6>
+              <span className="text-muted" style={{ cursor: "pointer" }}>⚙️</span>
+            </div>
+            <div className="d-flex flex-wrap gap-2">
+              <span className="badge bg-light text-dark border p-2 text-lowercase">css</span>
+              <span className="badge bg-light text-dark border p-2 text-lowercase">html</span>
+              <span className="badge bg-light text-dark border p-2 text-lowercase">javascript</span>
+              <span className="badge bg-light text-dark border p-2 text-lowercase">python</span>
+            </div>
+          </div>
+        </div>
 
       </div>
-    </div>
+
+      {/* Feed Section */}
+      <div className="mb-3">
+        <h5 className="fw-bold text-dark mb-1">Interesting posts for you</h5>
+        <p className="text-secondary small mb-3">Based on your viewing history and watched tags. <a href="#feed" className="text-decoration-none">Customize your feed</a></p>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-5">
+           <div className="spinner-border text-primary" role="status"></div>
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="text-center text-muted py-5 card shadow-sm border-0 bg-light">
+           No matching posts found based on your history. Let's ask a question!
+        </div>
+      ) : (
+        <div className="d-flex flex-column gap-1">
+          {posts.map(post => (
+             <PostCard key={post._id} post={post} onAnswerAdded={() => { /* re-fetch posts if answering from dash */ window.location.reload() }} />
+          ))}
+        </div>
+      )}
+    </Layout>
   );
 }
 

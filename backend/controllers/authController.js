@@ -47,9 +47,9 @@ exports.login = async (req, res) => {
 
     // create token
     const token = jwt.sign(
-      { id: user._id },
+      { id: user._id, isAdmin: user.isAdmin || false, role: 'user' },
       'secretkey',
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
 
     res.json({ token });

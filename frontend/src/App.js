@@ -12,6 +12,11 @@ import Chat from "./pages/Chat";
 import Companies from "./pages/Companies";
 import AI from "./pages/AI";
 import Challenges from "./pages/Challenges";
+import ActiveChallenge from "./pages/ActiveChallenge";
+
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 function App() {
   return (
@@ -61,7 +66,17 @@ function App() {
         <Route path="/challenges" element={
           <ProtectedRoute><Challenges /></ProtectedRoute>
         } />
+        <Route path="/challenges/:id/view" element={
+          <ProtectedRoute><ActiveChallenge /></ProtectedRoute>
+        } />
+        
         <Route path="/signup" element={<Signup />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={
+          <AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
