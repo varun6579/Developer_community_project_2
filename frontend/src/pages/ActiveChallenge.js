@@ -6,11 +6,10 @@ function ActiveChallenge() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hour in seconds
-  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
     let timer = null;
-    if (isActive && timeLeft > 0) {
+    if (timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
@@ -20,7 +19,7 @@ function ActiveChallenge() {
       navigate("/challenges");
     }
     return () => clearInterval(timer);
-  }, [isActive, timeLeft, navigate]);
+  }, [timeLeft, navigate]);
 
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600);

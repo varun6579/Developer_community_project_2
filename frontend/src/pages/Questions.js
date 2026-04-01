@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPosts, createPost } from "../services/api";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import PostCard from "../components/PostCard";
 
@@ -13,8 +13,6 @@ function Questions() {
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
-
-  const navigate = useNavigate();
 
   const fetchPosts = async () => {
     try {

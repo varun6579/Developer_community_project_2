@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api` : "http://localhost:5000/api";
 
 
 export const login = async (data) => {
@@ -154,6 +154,41 @@ export const updateUserProfile = async (data, id = null) => {
       "Authorization": token
     },
     body: JSON.stringify(payload)
+  });
+  return res.json();
+};
+
+// Admin API functions
+export const adminLogin = async (email, password) => {
+  const res = await fetch(`${BASE_URL}/admin/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+  return res.json();
+};
+
+export const adminGetMe = async (adminToken) => {
+  const res = await fetch(`${BASE_URL}/admin/auth/me`, {
+    headers: { 'x-admin-auth-token': adminToken }
+  });
+  return res.json();
+};
+
+export const adminDeleteUser = async (userId, adminToken) => {
+  const res = await fetch(`${BASE_URL}/admin/auth/users/${userId}`, {
+    method: "DELETE",
+    headers: { 'x-admin-auth-token': adminToken }
+  });
+  return res.json();
+};
+
+export const adminDeletePost = async (postId, adminToken) => {
+  const res = await fetch(`${BASE_URL}/admin/auth/posts/${postId}`, {
+    method: "DELETE",
+    headers: { 'x-admin-auth-token': adminToken }
   });
   return res.json();
 };

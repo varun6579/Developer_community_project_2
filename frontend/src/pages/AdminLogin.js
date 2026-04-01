@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { adminLogin } from "../services/api";
 
 function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -14,17 +15,9 @@ function AdminLogin() {
     setError("");
     
     try {
-      const response = await fetch("http://localhost:5000/api/admin/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await adminLogin(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.adminToken) {
         localStorage.removeItem("token"); // Clear existing user session
         localStorage.setItem("adminToken", data.adminToken);
         // Navigate to home after admin login as requested

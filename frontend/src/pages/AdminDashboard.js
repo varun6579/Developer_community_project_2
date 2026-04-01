@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAllUsers, getPosts, adminGetMe, adminDeleteUser, adminDeletePost } from "../services/api";
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -19,27 +20,15 @@ function AdminDashboard() {
 
       try {
         setLoading(true);
-        const [usersData, postsData] = await Promise.all([
-          fetch("http://localhost:5000/api/users/all", {
-            headers: { 'Authorization': adminToken }
-          }),
-          fetch("http://localhost:5000/api/posts", {
-             headers: { 'Authorization': adminToken }
-          })
+        const [usersList, postsList, adminMe] = await Promise.all([
+          getAllUsers(),
+          getPosts(),
+          adminGetMe(adminToken)
         ]);
 
-        // Also fetch current admin profile
-        const adminMeRes = await fetch("http://localhost:5000/api/admin/auth/me", {
-            headers: { 'x-admin-auth-token': adminToken }
-        });
-
-        const usersList = await usersData.json();
-        const postsList = await postsData.json();
-        const adminMe = await adminMeRes.json();
-
-        if (usersData.ok) setUsers(usersList);
-        if (postsData.ok) setPosts(postsList);
-        if (adminMeRes.ok && adminMe.user) setCurrentAdmin(adminMe.user);
+        setUsers(usersList);
+        setPosts(postsList);
+        if (adminMe.user) setCurrentAdmin(adminMe.user);
       } catch (err) {
         console.error("Error fetching admin data:", err);
       } finally {
@@ -55,17 +44,11 @@ function AdminDashboard() {
 
     try {
       const adminToken = localStorage.getItem("adminToken");
-      const res = await fetch(`http://localhost:5000/api/admin/auth/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-auth-token': adminToken
-        }
-      });
+      const data = await adminDeleteUser(userId, adminToken);
       
-      if(res.ok) {
+      if(data._id) {
         setUsers(users.filter(u => u._id !== userId));
       } else {
-        const data = await res.json();
         alert(`Failed to delete: ${data.message}`);
       }
     } catch (err) {
@@ -79,17 +62,11 @@ function AdminDashboard() {
 
     try {
       const adminToken = localStorage.getItem("adminToken");
-      const res = await fetch(`http://localhost:5000/api/admin/auth/posts/${postId}`, {
-        method: 'DELETE',
-        headers: {
-          'x-admin-auth-token': adminToken
-        }
-      });
+      const data = await adminDeletePost(postId, adminToken);
       
-      if(res.ok) {
+      if(data._id) {
         setPosts(posts.filter(p => p._id !== postId));
       } else {
-        const data = await res.json();
         alert(`Failed to delete: ${data.message}`);
       }
     } catch (err) {
