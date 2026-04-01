@@ -57,9 +57,7 @@ function Tags() {
                      {tag.description}
                    </p>
                 </div>
-                ///<div className="card-footer bg-transparent border-0 pt-0 text-end">
-                  /// <button className="btn btn-link btn-sm text-decoration-none fw-bold p-0">Browse Question &rarr;</button>
-                //</div>///
+               
               </div>
             </div>
           ))}
