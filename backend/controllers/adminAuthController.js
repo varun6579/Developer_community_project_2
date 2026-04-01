@@ -21,7 +21,7 @@ exports.login = async (req, res) => {
     // create token
     const adminToken = jwt.sign(
       { id: admin._id, role: 'admin', isAdmin: true },
-      'secretkey', // You should use process.env.JWT_SECRET in production
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 

@@ -8,7 +8,7 @@ const adminAuthMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(adminToken, 'secretkey'); // Use process.env.JWT_SECRET in production
+    const decoded = jwt.verify(adminToken, process.env.JWT_SECRET);
     if (decoded.role !== 'admin') {
        return res.status(403).json({ message: 'Forbidden: Admins only' });
     }

@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
     // create token
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin || false, role: 'user' },
-      process.env.JWT_SECRET || 'secretkey',
+      process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 

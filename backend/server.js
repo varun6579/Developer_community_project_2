@@ -13,7 +13,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
-  process.env.FRONTEND_URL || 'https://your-vercel-app-url.vercel.app'
+  'https://developer-community-project-2-la7x.vercel.app'
 ];
 
 app.use(cors({
