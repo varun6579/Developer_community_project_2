@@ -87,7 +87,7 @@ function Home() {
             <p className="small text-muted mb-4 mt-2">
               Take the tour to earn your first badge!
             </p>
-            <button className="btn btn-primary btn-sm rounded-pill mt-auto w-75 py-2">
+            <button className="btn btn-primary btn-sm rounded-pill mt-auto w-75 py-2" onClick={() => navigate('/questions')}>
               Get started here
             </button>
           </div>
