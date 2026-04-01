@@ -33,6 +33,10 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     // find user
     const user = await User.findOne({ email });
     if (!user) {
@@ -48,7 +52,7 @@ exports.login = async (req, res) => {
     // create token
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin || false, role: 'user' },
-      'secretkey',
+      process.env.JWT_SECRET || 'secretkey',
       { expiresIn: '7d' }
     );
 
