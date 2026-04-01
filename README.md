@@ -174,7 +174,7 @@ Feel free to fork this repo and submit a pull request.
 ## 📧 Contact
 
 For collaboration or queries:
-📩 [your-email@example.com](mailto:your-email@example.com)
+📩 [varuntejbommeraboina@gmail.com](mailto:varuntejbommeraboina@gmail.com)
 
 ---
 
