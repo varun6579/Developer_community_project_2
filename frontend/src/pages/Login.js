@@ -18,8 +18,10 @@ function Login() {
       const data = await login({ email, password });
 
       if (data.token) {
+        console.log("Login: Received token:", data.token.substring(0, 20) + "...");
         localStorage.removeItem("adminToken"); // Clear existing admin session
         localStorage.setItem("token", data.token);
+        console.log("Login: Token stored, navigating to /home");
         navigate("/home");
       } else {
         setError(data.message || "Invalid credentials");
@@ -57,7 +59,12 @@ function Login() {
             </div>
 
             <div className="mb-5">
-              <label className="form-label small text-muted">Password</label>
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <label className="form-label small text-muted mb-0">Password</label>
+                <Link to="/forgot-password" className="small text-decoration-none" style={{ color: "#6366f1" }}>
+                  Forgot Password?
+                </Link>
+              </div>
               <input
                 type="password"
                 className="form-control bg-white text-dark border-light shadow-sm"

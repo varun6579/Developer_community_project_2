@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
+import CompleteProfile from "./pages/CompleteProfile";
 import Questions from "./pages/Questions";
 import Tags from "./pages/Tags";
 import Users from "./pages/Users";
@@ -18,13 +19,19 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Public */}
+        {/* Public */}  
         <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Protected */}
         <Route path="/home" element={
@@ -33,6 +40,10 @@ function App() {
 
         <Route path="/profile/:id" element={
           <ProtectedRoute><Profile /></ProtectedRoute>
+        } />
+
+        <Route path="/complete-profile" element={
+          <ProtectedRoute><CompleteProfile /></ProtectedRoute>
         } />
 
         <Route path="/questions" element={
@@ -70,8 +81,6 @@ function App() {
           <ProtectedRoute><ActiveChallenge /></ProtectedRoute>
         } />
         
-        <Route path="/signup" element={<Signup />} />
-
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={

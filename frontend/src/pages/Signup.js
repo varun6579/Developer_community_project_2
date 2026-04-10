@@ -25,7 +25,9 @@ function Signup() {
       const data = await signup({ name, email, password });
 
       if (data.message === "User registered successfully") {
-        navigate("/");
+        localStorage.removeItem("adminToken");
+        localStorage.setItem("token", data.token);
+        navigate("/complete-profile");
       } else {
         setError(data.message || "Registration failed");
       }

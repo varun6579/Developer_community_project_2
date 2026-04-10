@@ -18,6 +18,9 @@ function Profile() {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editGender, setEditGender] = useState("male");
+  const [editPreferredName, setEditPreferredName] = useState("");
+  const [editRole, setEditRole] = useState("Developer");
+  const [editOrganization, setEditOrganization] = useState("");
   const [saving, setSaving] = useState(false);
 
   const fetchProfile = useCallback(async () => {
@@ -35,15 +38,20 @@ function Profile() {
         setEditName(profileData.user.name);
         setEditBio(profileData.user.bio || "");
         setEditGender(profileData.user.gender || "male");
+        setEditPreferredName(profileData.user.preferredName || "");
+        setEditRole(profileData.user.role || "Developer");
+        setEditOrganization(profileData.user.organization || "");
 
         if (meData && meData.user) {
           setMe(meData.user);
         }
         
-        const populatedPosts = profileData.posts.map(p => ({
-            ...p,
-            user: profileData.user
-        }));
+        const populatedPosts = Array.isArray(profileData.posts)
+          ? profileData.posts.map((p) => ({
+              ...p,
+              user: profileData.user
+            }))
+          : [];
         setPosts(populatedPosts);
       }
     } catch (err) {
@@ -65,7 +73,10 @@ function Profile() {
       const res = await updateUserProfile({
         name: editName,
         bio: editBio,
-        gender: editGender
+        gender: editGender,
+        preferredName: editPreferredName,
+        role: editRole,
+        organization: editOrganization
       }, user._id); 
 
       if (res.user) {
@@ -149,14 +160,36 @@ function Profile() {
                       onChange={(e) => setEditName(e.target.value)}
                       placeholder="Your Name"
                     />
+                    <input 
+                      className="form-control form-control-sm mb-2 text-center" 
+                      value={editPreferredName}
+                      onChange={(e) => setEditPreferredName(e.target.value)}
+                      placeholder="Preferred Name"
+                    />
                     <select 
-                      className="form-select form-select-sm text-center" 
+                      className="form-select form-select-sm text-center mb-2" 
                       value={editGender} 
                       onChange={(e) => setEditGender(e.target.value)}
                     >
                       <option value="male">Male (Avatar: 👨)</option>
                       <option value="female">Female (Avatar: 👩)</option>
                     </select>
+                    <select 
+                      className="form-select form-select-sm text-center mb-2" 
+                      value={editRole} 
+                      onChange={(e) => setEditRole(e.target.value)}
+                    >
+                      <option value="Student">Student</option>
+                      <option value="Developer">Developer</option>
+                      <option value="Professional">Professional</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    <input 
+                      className="form-control form-control-sm mb-2 text-center" 
+                      value={editOrganization}
+                      onChange={(e) => setEditOrganization(e.target.value)}
+                      placeholder="College or Company"
+                    />
                  </div>
               )}
             </div>
@@ -164,7 +197,12 @@ function Profile() {
             <div className="card-body p-4 text-center">
               <h6 className="text-muted fw-bold mb-3 text-uppercase" style={{ letterSpacing: "1px" }}>About</h6>
               {!isEditing ? (
-                 <p className="lead">{user.bio || `Hey! I am ${user.name} and I use Dev Community 🚀`}</p>
+                 <>
+                   <p className="lead">{user.bio || `Hey! I am ${user.name} and I use Dev Community 🚀`}</p>
+                   {user.preferredName && <p className="mb-1"><strong>Preferred name:</strong> {user.preferredName}</p>}
+                   {user.role && <p className="mb-1"><strong>Role:</strong> {user.role}</p>}
+                   {user.organization && <p className="mb-0"><strong>College / Company:</strong> {user.organization}</p>}
+                 </>
               ) : (
                 <form onSubmit={handleUpdate}>
                    <textarea 

@@ -15,14 +15,27 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   gender: {
-  type: String,
-  enum: ["male", "female"],
-  default: "male"
-},
+    type: String,
+    enum: ["male", "female"],
+    default: "male"
+  },
+  preferredName: {
+    type: String,
+    default: ""
+  },
+  role: {
+    type: String,
+    enum: ["Student", "Developer", "Professional", "Other"],
+    default: "Developer"
+  },
+  organization: {
+    type: String,
+    default: ""
+  },
   bio: {
-  type: String,
-  default: "Hey! I am using Dev Community 🚀"
-},
+    type: String,
+    default: "Hey! I am using Dev Community 🚀"
+  },
   isAdmin: {
     type: Boolean,
     default: false

@@ -17,13 +17,29 @@ function Users() {
         getAllUsers(),
         getCurrentUser()
       ]);
-      setUsers(usersData);
+      if (Array.isArray(usersData)) {
+        setUsers(usersData);
+      } else if (usersData && Array.isArray(usersData.users)) {
+        setUsers(usersData.users);
+      } else {
+        setUsers([]);
+        setError(usersData?.message || "Failed to load profiles.");
+      }
       if (meData && meData.user) {
          setCurrentUser(meData.user);
+      } else if (meData && meData.message) {
+        // Auth failed, redirect to login
+        navigate("/");
+        return;
       }
       setError(null);
     } catch (err) {
-      setError("Failed to fetch developers network.");
+      if (err.message.includes("authorization") || err.message.includes("token")) {
+        // Auth error, redirect to login
+        navigate("/");
+        return;
+      }
+      setError(err.message || "Failed to fetch developers network.");
     } finally {
       setLoading(false);
     }

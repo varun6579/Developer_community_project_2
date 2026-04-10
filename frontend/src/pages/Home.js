@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import PostCard from "../components/PostCard";
-import { getPosts, getCurrentUser } from "../services/api";
+import { getPosts, getCurrentUser, getNotifications } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
@@ -14,14 +15,18 @@ function Home() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [postsData, userData] = await Promise.all([
+        const [postsData, userData, notificationsData] = await Promise.all([
           getPosts(),
-          getCurrentUser()
+          getCurrentUser(),
+          getNotifications()
         ]);
         
         setPosts(postsData);
         if (userData && userData.user) {
           setCurrentUser(userData.user);
+        }
+        if (notificationsData && notificationsData.notifications) {
+          setNotifications(notificationsData.notifications);
         }
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
@@ -53,7 +58,55 @@ function Home() {
         </button>
       </div>
 
-
+      {/* Admin Notifications */}
+      {notifications.length > 0 && (
+        <>
+          <style>
+            {`
+              @keyframes slideLeft {
+                0% { transform: translateX(100%); }
+                100% { transform: translateX(-100%); }
+              }
+              .notification-slider {
+                animation: slideLeft 20s linear infinite;
+              }
+            `}
+          </style>
+          <div className="mb-4">
+            <div className="notification-container" style={{
+              overflow: 'hidden',
+              position: 'relative',
+              height: '50px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '10px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+            }}>
+              <div className="notification-slider" style={{
+                display: 'flex',
+                whiteSpace: 'nowrap'
+              }}>
+                {notifications.map((notification, index) => (
+                  <div key={notification._id} className="notification-item d-flex align-items-center px-4 py-2" style={{
+                    flexShrink: 0,
+                    color: 'white',
+                    fontSize: '0.9rem',
+                    fontWeight: '500'
+                  }}>
+                    <span className="me-2">
+                      {notification.type === 'announcement' ? '📢' : 
+                       notification.type === 'update' ? '🔄' : 
+                       notification.type === 'alert' ? '⚠️' : '🎉'}
+                    </span>
+                    <span className="fw-bold me-2">{notification.title}:</span>
+                    <span>{notification.message}</span>
+                    {index < notifications.length - 1 && <span className="mx-4">•</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Metrics Row */}
       <div className="row g-3 mb-5">
@@ -87,7 +140,7 @@ function Home() {
             <p className="small text-muted mb-4 mt-2">
               Take the tour to earn your first badge!
             </p>
-            <button className="btn btn-primary btn-sm rounded-pill mt-auto w-75 py-2">
+            <button className="btn btn-primary btn-sm rounded-pill mt-auto w-75 py-2" onClick={() => navigate('/questions')}>
               Get started here
             </button>
           </div>

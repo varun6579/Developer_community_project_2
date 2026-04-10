@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const userRoutes = require("./routes/userRoutes");
 
 
@@ -50,6 +51,9 @@ app.use("/api/challenges", challengeRoutes);
 
 const messageRoutes = require("./routes/messageRoutes");
 app.use("/api/messages", messageRoutes);
+
+const notificationRoutes = require("./routes/notificationRoutes");
+app.use("/api/notifications", notificationRoutes);
 
 const authMiddleware = require('./middleware/authMiddleware');
 

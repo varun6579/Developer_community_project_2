@@ -8,11 +8,8 @@ const seedAdmin = async () => {
   try {
     await connectDB();
 
-    const existingAdmin = await Admin.findOne({ email: 'admin@example.com' });
-    if (existingAdmin) {
-      console.log('Admin already exists.');
-      process.exit();
-    }
+    // Delete existing admin to recreate with correct password
+    await Admin.deleteOne({ email: 'admin@example.com' });
 
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
@@ -24,7 +21,7 @@ const seedAdmin = async () => {
     });
 
     await admin.save();
-    console.log('Super Admin created successfully (admin@example.com / admin123)');
+    console.log('✅ Super Admin created successfully (admin@example.com / admin123)');
     process.exit();
   } catch (error) {
     console.error('Error creating admin:', error);

@@ -1,5 +1,16 @@
 const BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api` : "http://localhost:5000/api";
 
+const getUserToken = () => localStorage.getItem("token");
+const getAdminToken = () => localStorage.getItem("adminToken");
+
+const getAuthToken = () => {
+  return getUserToken() || getAdminToken();
+};
+
+const getAuthHeaders = () => {
+  const token = getAuthToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 export const login = async (data) => {
   const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -23,20 +34,42 @@ export const signup = async (data) => {
   return res.json();
 };
 
+export const forgotPassword = async (email) => {
+  const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email })
+  });
+  return res.json();
+};
+
+export const resetPassword = async (resetToken, newPassword) => {
+  const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ resetToken, newPassword })
+  });
+  return res.json();
+};
+
 export const getPosts = async () => {
   const res = await fetch(`${BASE_URL}/posts`);
   return res.json();
 };
 
 export const createPost = async (data) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
+  const headers = {
+    "Content-Type": "application/json",
+    ...getAuthHeaders()
+  };
 
   const res = await fetch(`${BASE_URL}/posts`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": token
-    },
+    headers,
     body: JSON.stringify(data)
   });
 
@@ -44,13 +77,11 @@ export const createPost = async (data) => {
 };
 
 export const addAnswer = async (postId, text) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-
   const res = await fetch(`${BASE_URL}/posts/${postId}/answer`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": token
+      ...getAuthHeaders()
     },
     body: JSON.stringify({ text })
   });
@@ -63,13 +94,25 @@ export const getUserProfile = async (userId) => {
 };
 
 export const getCurrentUser = async () => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-  if (!token) return null;
+  const token = getAuthToken();
+  console.log("API: getCurrentUser called, token exists:", !!token);
+  if (!token) {
+    console.log("API: No token found");
+    return null;
+  }
+  console.log("API: Making request to /api/protected");
   const res = await fetch(`${BASE_URL}/protected`, {
-    headers: { Authorization: token }
+    headers: getAuthHeaders()
   });
-  if (!res.ok) return null;
-  return res.json();
+  console.log("API: Response status:", res.status);
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.log("API: Response not ok, error:", errorData);
+    return { message: errorData.message || "Not authenticated" };
+  }
+  const data = await res.json();
+  console.log("API: Success, user data:", data);
+  return data;
 };
 
 export const getTopUsers = async () => {
@@ -79,21 +122,25 @@ export const getTopUsers = async () => {
 };
 
 export const getAllUsers = async () => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/users/all`, {
-    headers: { Authorization: token }
+    headers: getAuthHeaders()
   });
-  if (!res.ok) throw new Error("Failed to fetch users");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to fetch developers network");
+  }
   return res.json();
 };
 
 export const deleteUser = async (id) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/users/${id}`, {
     method: "DELETE",
-    headers: { Authorization: token }
+    headers: getAuthHeaders()
   });
-  if (!res.ok) throw new Error("Failed to delete user");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to delete user");
+  }
   return res.json();
 };
 
@@ -110,30 +157,27 @@ export const getChallenges = async () => {
 };
 
 export const getMessages = async (userId) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/messages/${userId}`, {
-    headers: { Authorization: token }
+    headers: getAuthHeaders()
   });
   if (!res.ok) return [];
   return res.json();
 };
 
 export const getConversations = async () => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/messages/conversations`, {
-    headers: { Authorization: token }
+    headers: getAuthHeaders()
   });
   if (!res.ok) return {};
   return res.json();
 };
 
 export const sendMessage = async (receiverId, text) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
   const res = await fetch(`${BASE_URL}/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: token
+      ...getAuthHeaders()
     },
     body: JSON.stringify({ receiverId, text })
   });
@@ -142,8 +186,6 @@ export const sendMessage = async (receiverId, text) => {
 };
 
 export const updateUserProfile = async (data, id = null) => {
-  const token = localStorage.getItem("adminToken") || localStorage.getItem("token");
-  
   const payload = { ...data };
   if (id) payload.targetId = id;
 
@@ -151,7 +193,7 @@ export const updateUserProfile = async (data, id = null) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": token
+      ...getAuthHeaders()
     },
     body: JSON.stringify(payload)
   });
@@ -171,24 +213,72 @@ export const adminLogin = async (email, password) => {
 };
 
 export const adminGetMe = async (adminToken) => {
+  const token = adminToken || getAdminToken();
   const res = await fetch(`${BASE_URL}/admin/auth/me`, {
-    headers: { 'x-admin-auth-token': adminToken }
+    headers: { 'x-admin-auth-token': token }
   });
   return res.json();
 };
 
 export const adminDeleteUser = async (userId, adminToken) => {
+  const token = adminToken || getAdminToken();
   const res = await fetch(`${BASE_URL}/admin/auth/users/${userId}`, {
     method: "DELETE",
-    headers: { 'x-admin-auth-token': adminToken }
+    headers: { 'x-admin-auth-token': token }
   });
   return res.json();
 };
 
 export const adminDeletePost = async (postId, adminToken) => {
+  const token = adminToken || getAdminToken();
   const res = await fetch(`${BASE_URL}/admin/auth/posts/${postId}`, {
     method: "DELETE",
-    headers: { 'x-admin-auth-token': adminToken }
+    headers: { 'x-admin-auth-token': token }
+  });
+  return res.json();
+};
+
+// Notification API functions
+export const createNotification = async (notificationData, adminToken) => {
+  const token = adminToken || getAdminToken();
+  const res = await fetch(`${BASE_URL}/notifications`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      'x-admin-auth-token': token
+    },
+    body: JSON.stringify(notificationData)
+  });
+  return res.json();
+};
+
+export const getNotifications = async () => {
+  const res = await fetch(`${BASE_URL}/notifications`);
+  return res.json();
+};
+
+export const getAdminNotifications = async (adminToken) => {
+  const token = adminToken || getAdminToken();
+  const res = await fetch(`${BASE_URL}/notifications/all`, {
+    headers: { 'x-admin-auth-token': token }
+  });
+  return res.json();
+};
+
+export const deleteNotification = async (notificationId, adminToken) => {
+  const token = adminToken || getAdminToken();
+  const res = await fetch(`${BASE_URL}/notifications/${notificationId}`, {
+    method: "DELETE",
+    headers: { 'x-admin-auth-token': token }
+  });
+  return res.json();
+};
+
+export const toggleNotification = async (notificationId, adminToken) => {
+  const token = adminToken || getAdminToken();
+  const res = await fetch(`${BASE_URL}/notifications/${notificationId}/toggle`, {
+    method: "PATCH",
+    headers: { 'x-admin-auth-token': token }
   });
   return res.json();
 };

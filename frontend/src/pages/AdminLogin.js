@@ -20,8 +20,7 @@ function AdminLogin() {
       if (data.adminToken) {
         localStorage.removeItem("token"); // Clear existing user session
         localStorage.setItem("adminToken", data.adminToken);
-        // Navigate to home after admin login as requested
-        navigate("/home");
+        navigate("/admin/dashboard");
       } else {
         setError(data.message || "Invalid Admin Credentials");
       }

@@ -43,7 +43,7 @@ const getUserProfile = async (req, res) => {
 //  Update profile
 const updateProfile = async (req, res) => {
   try {
-    const { name, bio, gender, targetId } = req.body;
+    const { name, bio, gender, preferredName, role, organization, targetId } = req.body;
     let user;
 
     const isAdminAcc = req.user.role === 'admin' || req.user.isAdmin === true;
@@ -65,6 +65,9 @@ const updateProfile = async (req, res) => {
     user.name = name || user.name;
     user.bio = bio || user.bio;
     user.gender = gender || user.gender;
+    user.preferredName = preferredName !== undefined ? preferredName : user.preferredName;
+    user.role = role || user.role;
+    user.organization = organization || user.organization;
 
     await user.save();
 

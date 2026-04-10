@@ -36,21 +36,42 @@ function Layout({ children }) {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setAuthLoading(true);
+        console.log("Layout: Starting auth verification...");
+        const token = localStorage.getItem("token") || localStorage.getItem("adminToken");
+        console.log("Layout: Token found:", !!token);
+        
         const userRes = await getCurrentUser();
-        if (userRes && userRes.user) setCurrentUser(userRes.user);
+        console.log("Layout: getCurrentUser response:", userRes);
+        
+        if (userRes && userRes.user) {
+          console.log("Layout: Auth successful, user:", userRes.user.name);
+          setCurrentUser(userRes.user);
+        } else if (userRes && userRes.message) {
+          // Auth failed, clear tokens and redirect
+          console.log("Layout: Auth failed:", userRes.message);
+          localStorage.removeItem("token");
+          localStorage.removeItem("adminToken");
+          navigate("/");
+          return;
+        }
         
         const topRes = await getTopUsers();
         if (topRes && Array.isArray(topRes)) setTopUsers(topRes);
       } catch (err) {
-        console.error("Error fetching layout data:", err);
+        console.error("Layout: Error fetching layout data:", err);
+        // Don't redirect on network errors, just log
+      } finally {
+        setAuthLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -92,12 +113,22 @@ function Layout({ children }) {
 
   return (
     <div className="container-fluid" style={{ fontFamily: "Inter, sans-serif" }}>
-      <div className="row">
-        
-        {/* Left Sidebar */}
-        <div className="col-md-2 vh-100 py-3 position-fixed bg-white border-end" style={{ zIndex: 1000, overflowY: "auto", paddingRight: 0 }}>
+      {authLoading ? (
+        <div className="vh-100 d-flex justify-content-center align-items-center bg-light">
+          <div className="text-center">
+            <div className="spinner-border text-primary mb-3" role="status"></div>
+            <p className="text-muted">Verifying authentication...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="row">
+        <div className="row">
           
-          <div className="d-flex align-items-center mb-4 px-3" style={{ cursor: "pointer" }} onClick={() => navigate('/home')}>
+          {/* Left Sidebar */}
+          <div className="col-md-2 vh-100 py-3 position-fixed bg-white border-end" style={{ zIndex: 1000, overflowY: "auto", paddingRight: 0 }}>
+            
+            <div className="d-flex align-items-center mb-4 px-3" style={{ cursor: "pointer" }} onClick={() => navigate('/home')}>
+               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="me-2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="me-2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
              <h5 className="fw-bold m-0 text-dark" style={{ letterSpacing: "-0.5px" }}>DevCommunity</h5>
           </div>
@@ -383,7 +414,9 @@ function Layout({ children }) {
             </>
           )}
         </div>
-      </div>
+        </div>
+        </div>
+      )}
     </div>
   );
 }
