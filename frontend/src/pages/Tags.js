@@ -2,7 +2,7 @@ import { useState } from "react";
 import Layout from "../components/Layout";
 
 const initialTags = [
-  { name: "React", count: 1240, description: "Declarative, efficient, and flexible JavaScript library for building user interfaces.", color: "primary" },
+  { name: "React", count: 1240, description: "Declarative, efficient and flexible JavaScript library for building user interfaces.", color: "primary" },
   { name: "JavaScript", count: 2850, description: "The language of the web. Essential for front-end and back-end development.", color: "warning" },
   { name: "Node.js", count: 960, description: "Asynchronous event-driven JavaScript runtime built on Chrome's V8 JS engine.", color: "success" },
   { name: "MongoDB", count: 540, description: "The database for modern applications. Document-based, distributed, and multi-cloud.", color: "success" },

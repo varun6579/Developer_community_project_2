@@ -187,7 +187,7 @@ function AdminDashboard() {
               ← Back Home
             </button>
             <Link className="navbar-brand fw-bold mb-0" style={{ color: "#6366f1" }} to="/admin/dashboard">
-              <span className="me-2">🛡️</span>Admin Console
+              <span className="me-2">🛡️</span>Admin-Console
             </Link>
           </div>
 
