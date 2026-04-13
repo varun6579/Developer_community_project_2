@@ -10,17 +10,16 @@ const connectDB = require('./config/db');
 
 const app = express();
 
-// ✅ middleware FIRST
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5000',
-  'https://developer-community-project-2-la7x.vercel.app'
-];
-
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin) return callback(null, true); // allow server-to-server, Postman, etc.
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin) return callback(null, true); 
+    
+    // Allow localhost, any vercel preview/main domain, and render
+    if (
+      origin.includes('localhost') || 
+      origin.includes('.vercel.app') || 
+      origin.includes('.onrender.com')
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy: origin ${origin} not allowed`));
