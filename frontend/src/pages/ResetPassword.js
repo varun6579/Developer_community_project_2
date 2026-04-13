@@ -118,7 +118,7 @@ function ResetPassword() {
               {loading ? "Resetting..." : "🔑 Reset Password"}
             </button>
 
-            <Link to="/login" className="btn w-100 btn-outline-secondary d-block text-center text-decoration-none rounded-pill small" style={{ fontSize: "0.85rem" }}>
+            <Link to="/" className="btn w-100 btn-outline-secondary d-block text-center text-decoration-none rounded-pill small" style={{ fontSize: "0.85rem" }}>
               ← Back to Login
             </Link>
           </form>
