@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api` : "http://localhost:5000/api";
+const BASE_URL = process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api` : "https://developer-community-project-2.onrender.com/api";
 
 const getUserToken = () => localStorage.getItem("token");
 const getAdminToken = () => localStorage.getItem("adminToken");
