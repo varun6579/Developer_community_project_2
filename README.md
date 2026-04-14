@@ -25,7 +25,7 @@ A full-stack **MERN** application that enables developers to collaborate, share 
 ## 🛠️ Tech Stack
 
 ### Frontend
-
+* Html
 * React.js
 * CSS
 
