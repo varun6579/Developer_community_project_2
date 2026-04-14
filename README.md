@@ -6,7 +6,7 @@ A full-stack **MERN** application that enables developers to collaborate, share 
 
 ## 🌐 Live Demo
 
-* 🔗 Frontend: https://dev-community-platform-v2-varun6579s-projects.vercel.app/
+* 🔗 Frontend: https://developer-community-project-2-la7x.vercel.app/
 * ⚙️ Backend API: https://developer-community-project-2.onrender.com
 
 ---
