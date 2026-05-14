@@ -1,8 +1,20 @@
-# 🚀 DevConnect – Developer Community Platform
+
+## Note Regarding Browser Warning
+
+Some browsers may display a security warning when opening the deployed application. This occurs because the frontend and backend are hosted on separate platforms (Frontend on Vercel and Backend APIs on Render), which can occasionally trigger automated browser safety checks or temporary backend cold-start behavior.
+
+The project itself is safe to access and does not collect sensitive personal information. If the warning appears, please click:
+
+Advanced → Continue to Site
+
+The application and source code are fully available in this repository for verification.
+
+# DevConnect – Developer Community Platform
 
 A full-stack **MERN** application that enables developers to collaborate, share knowledge, and engage in discussions through posts and comments.
 
 ---
+
 
 ## 🌐 Live Demo
 
